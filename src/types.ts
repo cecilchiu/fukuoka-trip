@@ -18,8 +18,8 @@ export interface ItineraryItem {
 
 export interface DayItinerary {
   id: string;
-  date: string; // MM/DD Format
-  dayLabel: string; // D1, D2, etc.
+  date: string;
+  dayLabel: string;
   title: string;
   items: ItineraryItem[];
 }

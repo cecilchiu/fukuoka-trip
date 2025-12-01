@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ITINERARY_DATA, TRIP_TITLE, TRIP_DATES, ACCOMMODATIONS, DINING_LIST, CHECKLIST_DATA, getActivityIcon } from './constants';
-import { ActivityType } from './types';
+import { ITINERARY_DATA, ACCOMMODATIONS, DINING_LIST, CHECKLIST_DATA, getActivityIcon } from './constants';
+import { ActivityType, ChatMessage } from './types';
 import { MapleLeaf } from './components/MapleLeaf';
-import { sendMessageToGemini } from './services/gemini';
-import { Calendar, Hotel, Coffee, Sparkles, Send, MapPin, Navigation, ClipboardCheck, CheckCircle2, Circle } from 'lucide-react';
+import { sendMessageToGemini, initializeAI } from './services/gemini';
+import { Calendar, Hotel, Coffee, Sparkles, Send, MapPin, Navigation, ClipboardCheck, CheckCircle2, Circle, KeyRound } from 'lucide-react';
 
 enum Tab {
   ITINERARY = 'ITINERARY',
@@ -14,15 +14,21 @@ enum Tab {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState(Tab.ITINERARY);
-  const [selectedDayId, setSelectedDayId] = useState(ITINERARY_DATA[0].id);
+  const [activeTab, setActiveTab] = useState<Tab>(Tab.ITINERARY);
+  const [selectedDayId, setSelectedDayId] = useState<string>(ITINERARY_DATA[0].id);
+
+  // AI State
   const [chatInput, setChatInput] = useState('');
-  const [chatHistory, setChatHistory] = useState([
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     { role: 'model', text: '你好！我是你的福岡旅遊小幫手。有任何關於行程、秋月城跡、由布院或其他景點的問題都可以問我喔！' }
   ]);
   const [isAiLoading, setIsAiLoading] = useState(false);
-  const chatEndRef = useRef(null);
-  const [checkedItems, setCheckedItems] = useState({});
+  const [showKeyInput, setShowKeyInput] = useState(false);
+  const [apiKeyInput, setApiKeyInput] = useState('');
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Checklist State
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const saved = localStorage.getItem('trip_checklist_v1');
@@ -35,7 +41,7 @@ export default function App() {
     }
   }, []);
 
-  const toggleChecklistItem = (id) => {
+  const toggleChecklistItem = (id: string) => {
     const newChecked = { ...checkedItems, [id]: !checkedItems[id] };
     setCheckedItems(newChecked);
     localStorage.setItem('trip_checklist_v1', JSON.stringify(newChecked));
@@ -47,18 +53,35 @@ export default function App() {
     }
   }, [chatHistory, activeTab]);
 
+  const handleSaveKey = () => {
+    if (apiKeyInput.trim()) {
+      initializeAI(apiKeyInput.trim());
+      setShowKeyInput(false);
+      setChatHistory(prev => [...prev, { role: 'model', text: 'API Key 設定成功！你可以開始問我問題了。' }]);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!chatInput.trim()) return;
     
-    const userMsg = { role: 'user', text: chatInput };
+    const userMsg: ChatMessage = { role: 'user', text: chatInput };
     setChatHistory(prev => [...prev, userMsg]);
     setChatInput('');
     setIsAiLoading(true);
 
-    const responseText = await sendMessageToGemini(chatInput);
-    
-    setChatHistory(prev => [...prev, { role: 'model', text: responseText }]);
-    setIsAiLoading(false);
+    try {
+      const responseText = await sendMessageToGemini(chatInput);
+      setChatHistory(prev => [...prev, { role: 'model', text: responseText }]);
+    } catch (error: any) {
+      if (error.message === 'API_KEY_MISSING') {
+        setShowKeyInput(true);
+        setChatHistory(prev => [...prev, { role: 'model', text: '請先設定您的 Google Gemini API Key 才能使用此功能。' }]);
+      } else {
+        setChatHistory(prev => [...prev, { role: 'model', text: '發生錯誤，請稍後再試。' }]);
+      }
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   const renderItinerary = () => {
@@ -294,6 +317,34 @@ export default function App() {
             </div>
           </div>
         ))}
+        
+        {showKeyInput && (
+          <div className="flex justify-center my-4 animate-fade-in">
+            <div className="bg-white p-4 rounded-xl border border-orange-200 shadow-sm w-full max-w-xs">
+              <div className="flex items-center gap-2 mb-2 text-orange-800 font-bold text-sm">
+                <KeyRound size={16} />
+                <span>輸入 Gemini API Key</span>
+              </div>
+              <p className="text-xs text-stone-500 mb-3">
+                您的 Key 會儲存在手機端，不會上傳到伺服器。
+              </p>
+              <input 
+                type="text" 
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
+                placeholder="貼上 API Key"
+                className="w-full border border-stone-300 rounded-md px-3 py-2 text-sm mb-3 outline-none focus:border-orange-500"
+              />
+              <button 
+                onClick={handleSaveKey}
+                className="w-full bg-orange-700 text-white text-sm font-bold py-2 rounded-md hover:bg-orange-800 transition-colors"
+              >
+                儲存設定
+              </button>
+            </div>
+          </div>
+        )}
+
         {isAiLoading && (
           <div className="flex justify-start">
              <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-sm border border-stone-100 flex items-center gap-2">
@@ -328,76 +379,6 @@ export default function App() {
           AI 可以回答關於 {selectedDayId.toUpperCase()} 行程的細節
         </p>
       </div>
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-[#f5f5f4] text-stone-800 font-sans selection:bg-orange-200">
-      
-      <header className="bg-orange-900 text-orange-50 p-6 rounded-b-[2rem] shadow-lg relative overflow-hidden">
-        <div className="relative z-10">
-          <p className="text-orange-200 text-xs font-bold tracking-widest uppercase mb-1">{TRIP_DATES}</p>
-          <h1 className="text-3xl font-bold leading-tight font-serif">{TRIP_TITLE}</h1>
-        </div>
-        <MapleLeaf className="absolute -right-4 -top-4 w-32 h-32 text-orange-800 opacity-20 rotate-12" />
-        <MapleLeaf className="absolute left-10 bottom-0 w-16 h-16 text-orange-800 opacity-20 -rotate-45" />
-      </header>
-
-      <main className="pt-2">
-        {activeTab === Tab.ITINERARY && renderItinerary()}
-        {activeTab === Tab.STAY && renderStay()}
-        {activeTab === Tab.DINING && renderDining()}
-        {activeTab === Tab.CHECKLIST && renderChecklist()}
-        {activeTab === Tab.AI && renderAi()}
-      </main>
-
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-2 py-3 pb-safe z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
-        <div className="flex justify-between items-center max-w-md mx-auto">
-          
-          <button 
-            onClick={() => setActiveTab(Tab.ITINERARY)}
-            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.ITINERARY ? 'text-orange-700' : 'text-stone-400 hover:text-stone-600'}`}
-          >
-            <Calendar size={20} strokeWidth={activeTab === Tab.ITINERARY ? 2.5 : 2} />
-            <span className="text-[10px] font-medium">行程</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab(Tab.STAY)}
-            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.STAY ? 'text-orange-700' : 'text-stone-400 hover:text-stone-600'}`}
-          >
-            <Hotel size={20} strokeWidth={activeTab === Tab.STAY ? 2.5 : 2} />
-            <span className="text-[10px] font-medium">住宿</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab(Tab.DINING)}
-            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.DINING ? 'text-orange-700' : 'text-stone-400 hover:text-stone-600'}`}
-          >
-            <Coffee size={20} strokeWidth={activeTab === Tab.DINING ? 2.5 : 2} />
-            <span className="text-[10px] font-medium">美食</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab(Tab.CHECKLIST)}
-            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.CHECKLIST ? 'text-orange-700' : 'text-stone-400 hover:text-stone-600'}`}
-          >
-            <ClipboardCheck size={20} strokeWidth={activeTab === Tab.CHECKLIST ? 2.5 : 2} />
-            <span className="text-[10px] font-medium">清單</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab(Tab.AI)}
-            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.AI ? 'text-purple-600' : 'text-stone-400 hover:text-stone-600'}`}
-          >
-            <div className={`rounded-full p-1 ${activeTab === Tab.AI ? 'bg-purple-100' : ''}`}>
-              <Sparkles size={18} strokeWidth={activeTab === Tab.AI ? 2.5 : 2} className={activeTab === Tab.AI ? 'fill-purple-200' : ''} />
-            </div>
-            <span className="text-[10px] font-medium">AI 助手</span>
-          </button>
-
-        </div>
-      </nav>
     </div>
   );
 }

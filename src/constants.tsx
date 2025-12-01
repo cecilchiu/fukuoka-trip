@@ -1,9 +1,8 @@
 import { ActivityType, DayItinerary, Accommodation, DiningInfo, ChecklistCategory } from './types';
-import { Plane, Car, Train, MapPin, Utensils, ShoppingBag, BedDouble, Camera } from 'lucide-react';
+import { Car, MapPin, Utensils, ShoppingBag, BedDouble, Camera } from 'lucide-react';
 import React from 'react';
 
-// Icon Helper
-export const getActivityIcon = (type) => {
+export const getActivityIcon = (type: ActivityType) => {
   switch (type) {
     case ActivityType.TRANSPORT: return <Car size={18} />;
     case ActivityType.SIGHTSEEING: return <Camera size={18} />;
@@ -17,7 +16,7 @@ export const getActivityIcon = (type) => {
 export const TRIP_TITLE = "福岡賞楓之旅";
 export const TRIP_DATES = "2024年 12月3日 - 12月9日";
 
-export const ITINERARY_DATA = [
+export const ITINERARY_DATA: DayItinerary[] = [
   {
     id: 'd1',
     date: '12/03',
@@ -119,7 +118,7 @@ export const ITINERARY_DATA = [
   }
 ];
 
-export const ACCOMMODATIONS = [
+export const ACCOMMODATIONS: Accommodation[] = [
   { 
     name: 'S-PERIA飯店 福岡中洲', 
     checkIn: '12/03', 
@@ -143,7 +142,7 @@ export const ACCOMMODATIONS = [
   },
 ];
 
-export const DINING_LIST = [
+export const DINING_LIST: DiningInfo[] = [
   { name: '天麩羅処ひらお (Acros店)', type: '天婦羅', status: 'Planned', notes: '人氣現炸天婦羅，建議一開門就去', location: '天麩羅処ひらお 天神アクロス福岡店' },
   { name: 'ラーメン海鳴 (天神店)', type: '拉麵', status: 'Planned', notes: '魚介豚骨湯頭，味道濃郁', location: 'ラーメン海鳴 天神店' },
   { name: '治一郎 (Parco店)', type: '甜點', status: 'Planned', notes: '必吃年輪蛋糕與布丁', location: '治一郎 福岡パルコ店' },
@@ -154,7 +153,7 @@ export const DINING_LIST = [
   { name: '博多燒肉', type: '燒肉', status: 'TBD', notes: '記得提前預約', location: '博多' },
 ];
 
-export const CHECKLIST_DATA = [
+export const CHECKLIST_DATA: ChecklistCategory[] = [
   {
     id: 'pre-trip',
     title: '行前準備 (必帶)',

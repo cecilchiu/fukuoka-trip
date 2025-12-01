@@ -1,9 +1,32 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import { ITINERARY_DATA } from "../constants";
 
-const apiKey = import.meta.env.VITE_API_KEY || '';
+let ai: GoogleGenAI | null = null;
 
-const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
+export const initializeAI = (apiKey: string) => {
+  if (!apiKey) return;
+  try {
+    ai = new GoogleGenAI({ apiKey });
+    localStorage.setItem('gemini_api_key', apiKey);
+  } catch (e) {
+    console.error("Init AI Failed", e);
+  }
+};
+
+const loadInitialKey = () => {
+  // @ts-ignore
+  const envKey = import.meta.env?.VITE_API_KEY;
+  if (envKey) {
+    initializeAI(envKey);
+    return;
+  }
+  const storedKey = localStorage.getItem('gemini_api_key');
+  if (storedKey) {
+    initializeAI(storedKey);
+  }
+};
+
+loadInitialKey();
 
 const SYSTEM_INSTRUCTION = `
 你是一位友善且知識淵博的旅遊嚮導，專門負責福岡的旅遊行程。
@@ -23,13 +46,16 @@ ${JSON.stringify(ITINERARY_DATA)}
 語氣：溫暖、興奮、樂於助人。
 `;
 
-export const sendMessageToGemini = async (message) => {
+export const sendMessageToGemini = async (message: string): Promise<string> => {
   if (!ai) {
-    return "尚未設定 AI 金鑰。請確認您的 .env 檔案或環境變數設定。";
+    loadInitialKey();
+    if (!ai) {
+      throw new Error("API_KEY_MISSING");
+    }
   }
 
   try {
-    const response = await ai.models.generateContent({
+    const response: GenerateContentResponse = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
       contents: message,
       config: {
@@ -40,6 +66,6 @@ export const sendMessageToGemini = async (message) => {
     return response.text || "抱歉，我無法產生回應。";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return "抱歉，連接旅遊助手時發生錯誤。";
+    return "抱歉，連接旅遊助手時發生錯誤。請確認您的 API Key 是否正確。";
   }
 };
