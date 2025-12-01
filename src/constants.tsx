@@ -1,7 +1,7 @@
 import { ActivityType, DayItinerary, Accommodation, DiningInfo, ChecklistCategory } from './types';
 import { Car, MapPin, Utensils, ShoppingBag, BedDouble, Camera } from 'lucide-react';
-import React from 'react';
 
+// Icon Helper
 export const getActivityIcon = (type: ActivityType) => {
   switch (type) {
     case ActivityType.TRANSPORT: return <Car size={18} />;

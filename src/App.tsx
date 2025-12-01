@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ITINERARY_DATA, ACCOMMODATIONS, DINING_LIST, CHECKLIST_DATA, getActivityIcon } from './constants';
+import { ITINERARY_DATA, TRIP_TITLE, TRIP_DATES, ACCOMMODATIONS, DINING_LIST, CHECKLIST_DATA, getActivityIcon } from './constants';
 import { ActivityType, ChatMessage } from './types';
 import { MapleLeaf } from './components/MapleLeaf';
 import { sendMessageToGemini, initializeAI } from './services/gemini';
@@ -38,6 +38,11 @@ export default function App() {
       } catch (e) {
         console.error("Failed to parse checklist", e);
       }
+    }
+    
+    // Check if key exists
+    if (!localStorage.getItem('gemini_api_key') && !(import.meta as any).env?.VITE_API_KEY) {
+      // If we are on the AI tab, we might want to prompt, but let's wait for user interaction or error
     }
   }, []);
 
@@ -379,6 +384,76 @@ export default function App() {
           AI 可以回答關於 {selectedDayId.toUpperCase()} 行程的細節
         </p>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#f5f5f4] text-stone-800 font-sans selection:bg-orange-200">
+      
+      <header className="bg-orange-900 text-orange-50 p-6 rounded-b-[2rem] shadow-lg relative overflow-hidden">
+        <div className="relative z-10">
+          <p className="text-orange-200 text-xs font-bold tracking-widest uppercase mb-1">{TRIP_DATES}</p>
+          <h1 className="text-3xl font-bold leading-tight font-serif">{TRIP_TITLE}</h1>
+        </div>
+        <MapleLeaf className="absolute -right-4 -top-4 w-32 h-32 text-orange-800 opacity-20 rotate-12" />
+        <MapleLeaf className="absolute left-10 bottom-0 w-16 h-16 text-orange-800 opacity-20 -rotate-45" />
+      </header>
+
+      <main className="pt-2">
+        {activeTab === Tab.ITINERARY && renderItinerary()}
+        {activeTab === Tab.STAY && renderStay()}
+        {activeTab === Tab.DINING && renderDining()}
+        {activeTab === Tab.CHECKLIST && renderChecklist()}
+        {activeTab === Tab.AI && renderAi()}
+      </main>
+
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-200 px-2 py-3 pb-safe z-50 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+        <div className="flex justify-between items-center max-w-md mx-auto">
+          
+          <button 
+            onClick={() => setActiveTab(Tab.ITINERARY)}
+            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.ITINERARY ? 'text-orange-700' : 'text-stone-400 hover:text-stone-600'}`}
+          >
+            <Calendar size={20} strokeWidth={activeTab === Tab.ITINERARY ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">行程</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab(Tab.STAY)}
+            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.STAY ? 'text-orange-700' : 'text-stone-400 hover:text-stone-600'}`}
+          >
+            <Hotel size={20} strokeWidth={activeTab === Tab.STAY ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">住宿</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab(Tab.DINING)}
+            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.DINING ? 'text-orange-700' : 'text-stone-400 hover:text-stone-600'}`}
+          >
+            <Coffee size={20} strokeWidth={activeTab === Tab.DINING ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">美食</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab(Tab.CHECKLIST)}
+            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.CHECKLIST ? 'text-orange-700' : 'text-stone-400 hover:text-stone-600'}`}
+          >
+            <ClipboardCheck size={20} strokeWidth={activeTab === Tab.CHECKLIST ? 2.5 : 2} />
+            <span className="text-[10px] font-medium">清單</span>
+          </button>
+
+          <button 
+            onClick={() => setActiveTab(Tab.AI)}
+            className={`flex-1 flex flex-col items-center gap-1 transition-colors ${activeTab === Tab.AI ? 'text-purple-600' : 'text-stone-400 hover:text-stone-600'}`}
+          >
+            <div className={`rounded-full p-1 ${activeTab === Tab.AI ? 'bg-purple-100' : ''}`}>
+              <Sparkles size={18} strokeWidth={activeTab === Tab.AI ? 2.5 : 2} className={activeTab === Tab.AI ? 'fill-purple-200' : ''} />
+            </div>
+            <span className="text-[10px] font-medium">AI 助手</span>
+          </button>
+
+        </div>
+      </nav>
     </div>
   );
 }
