@@ -1,0 +1,5 @@
+# 忽略所有安裝的 Node.js 模組
+node_modules/
+
+# 忽略 npm 產生的 log 檔案
+*.log
