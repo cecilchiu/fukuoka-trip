@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://<您的GitHub帳號>.github.io/<您的Repo名稱>",
+  "homepage": "https://cecilchiu.github.io/fukuoka-trip",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
