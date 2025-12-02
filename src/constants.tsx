@@ -25,16 +25,19 @@ export const ITINERARY_DATA: DayItinerary[] = [
     items: [
       { id: '1-1', time: '04:00', title: '機場接送', description: '前往桃園機場', type: ActivityType.TRANSPORT },
       { id: '1-2', time: '06:50', title: '華航 CI110', description: 'TPE -> FUK (預計 10:00 抵達)', type: ActivityType.TRANSPORT, location: '福岡機場' },
-      { id: '1-3', time: '11:00', title: '抵達天神', description: '搭乘地鐵抵達天神站，寄放行李後開始行程', type: ActivityType.TRANSPORT, location: '天神站', travelInfo: '🚇 從福岡機場 15分鐘' },
-      { id: '1-4', time: '11:30', title: '午餐：天麩羅処ひらお', description: '福岡必吃現炸天婦羅 (營業時間 10:30-21:00)', type: ActivityType.FOOD, location: '天麩羅処ひらお 天神アクロス福岡店', travelInfo: '🚶 從天神站 10分鐘' },
-      { id: '1-5', time: '13:00', title: '點心：治一郎', description: 'Parco B1F 購買年輪蛋糕/布丁 (營業時間 10:00-20:30)', type: ActivityType.FOOD, location: '治一郎 福岡パルコ店', travelInfo: '🚶 步行 5分鐘' },
-      { id: '1-6', time: '13:45', title: 'Mont-bell 福岡天神', description: '知名戶外用品 (營業時間 10:00-21:00)', type: ActivityType.SHOPPING, location: 'mont-bell 福岡天神店', travelInfo: '🚶 步行 10分鐘' },
-      { id: '1-6-1', time: '14:45', title: 'The Full Full Tenjin', description: '天神區的人氣麵包店', type: ActivityType.FOOD, location: 'The Full Full Tenjin', travelInfo: '🚶 步行 10分鐘' },
-      { id: '1-7', time: '15:30', title: 'Rally Grass', description: '大名區老牌戶外選物店 (營業時間 11:00-20:00)', type: ActivityType.SHOPPING, location: 'Rally Grass', travelInfo: '🚶 步行 10分鐘' },
-      { id: '1-8', time: '17:00', title: '天神地下街', description: '連接南北的購物地下街 (營業時間 10:00-20:00)', type: ActivityType.SHOPPING, location: '天神地下街', travelInfo: '🚶 步行 10分鐘' },
-      { id: '1-9', time: '18:00', title: '好日山莊', description: '大丸福岡天神店 東館5F (營業時間 10:00-20:00)', type: ActivityType.SHOPPING, location: '好日山荘 大丸福岡天神店', travelInfo: '🚶 步行 10分鐘' },
-      { id: '1-10', time: '19:30', title: '晚餐：ラーメン海鳴', description: '魚介豚骨拉麵 (營業時間 11:00-03:00)', type: ActivityType.FOOD, location: 'ラーメン海鳴 天神店', travelInfo: '🚶 步行 10分鐘' },
-      { id: '1-11', time: '21:00', title: '飯店 Check-in', description: 'S-PERIA飯店 福岡中洲', type: ActivityType.STAY, location: 'S-PERIA飯店 福岡中洲', travelInfo: '🚶 步行 15分鐘' }
+      { id: '1-3', time: '10:30', title: '博多站取票', description: '取由布院之森車票', type: ActivityType.TRANSPORT, location: '博多站', travelInfo: '🚇 從福岡機場 5分鐘' },
+      { id: '1-4', time: '11:00', title: 'ヨドバシカメラ博多店', description: '博多車站旁的大型電器商場 (營業時間 9:30-22:00)', type: ActivityType.SHOPPING, location: 'ヨドバシカメラ マルチメディア博多', travelInfo: '🚶 博多站旁' },
+      { id: '1-5', time: '11:45', title: '飯店寄放行李', description: 'S-PERIA飯店 福岡中洲，寄放行李後輕鬆逛街', type: ActivityType.TRANSPORT, location: 'S-PERIA飯店 福岡中洲', travelInfo: '🚇 地鐵到中洲川端 10分鐘' },
+      { id: '1-6', time: '12:30', title: '午餐：天麩羅処ひらお', description: '福岡必吃現炸天婦羅 (營業時間 10:30-21:00)', type: ActivityType.FOOD, location: '天麩羅処ひらお 天神アクロス福岡店', travelInfo: '🚇 地鐵到天神 5分鐘+步行10分' },
+      { id: '1-7', time: '13:30', title: '點心：治一郎', description: 'Parco B1F 購買年輪蛋糕/布丁 (營業時間 10:00-20:30)', type: ActivityType.FOOD, location: '治一郎 福岡パルコ店', travelInfo: '🚶 步行 5分鐘' },
+      { id: '1-8', time: '14:15', title: 'ビックカメラ天神1号館', description: '天神區大型電器商場 (營業時間 10:00-21:00)', type: ActivityType.SHOPPING, location: 'ビックカメラ 天神1号館', travelInfo: '🚶 步行 10分鐘' },
+      { id: '1-9', time: '15:15', title: 'Mont-bell 福岡天神', description: '知名戶外用品 (營業時間 10:00-21:00)', type: ActivityType.SHOPPING, location: 'mont-bell 福岡天神店', travelInfo: '🚶 步行 5分鐘' },
+      { id: '1-10', time: '16:00', title: 'The Full Full Tenjin', description: '天神區的人氣麵包店', type: ActivityType.FOOD, location: 'The Full Full Tenjin', travelInfo: '🚶 步行 5分鐘' },
+      { id: '1-11', time: '16:30', title: 'Rally Grass', description: '大名區老牌戶外選物店 (營業時間 11:00-20:00)', type: ActivityType.SHOPPING, location: 'Rally Grass', travelInfo: '🚶 步行 10分鐘' },
+      { id: '1-12', time: '17:30', title: '天神地下街', description: '連接南北的購物地下街 (營業時間 10:00-20:00)', type: ActivityType.SHOPPING, location: '天神地下街', travelInfo: '🚶 步行 10分鐘' },
+      { id: '1-13', time: '18:30', title: '好日山莊', description: '大丸福岡天神店 東館5F (營業時間 10:00-20:00)', type: ActivityType.SHOPPING, location: '好日山荘 大丸福岡天神店', travelInfo: '🚶 步行 5分鐘' },
+      { id: '1-14', time: '19:30', title: '晚餐：ラーメン海鳴', description: '魚介豚骨拉麵 (營業時間 11:00-03:00)', type: ActivityType.FOOD, location: 'ラーメン海鳴 天神店', travelInfo: '🚶 步行 10分鐘' },
+      { id: '1-15', time: '21:00', title: '返回飯店', description: '晚餐後返回 S-PERIA飯店 福岡中洲休息', type: ActivityType.STAY, location: 'S-PERIA飯店 福岡中洲', travelInfo: '🚇 地鐵回中洲川端' }
     ]
   },
   {
@@ -93,7 +96,8 @@ export const ITINERARY_DATA: DayItinerary[] = [
       { id: '4-7', time: '15:30', title: 'COMICO ART MUSEUM YUFUIN', description: '當代藝術美術館，欣賞藝術作品', type: ActivityType.SIGHTSEEING, location: 'COMICO ART MUSEUM YUFUIN', travelInfo: '🚶 步行 10分鐘' },
       { id: '4-8', time: '17:00', title: '晚餐 (待定)', description: '由布院特色料理（可參考推薦清單）', type: ActivityType.FOOD },
       { id: '4-9', time: '18:00', title: '租車 (JR Rent-A-Car)', description: '由布院站営業所 (租到隔天18:00)', type: ActivityType.TRANSPORT, location: 'JR駅レンタカー 由布院駅営業所', travelInfo: '🚶 步行回車站' },
-      { id: '4-10', time: '18:30', title: '飯店 Check-in', description: '享受溫泉旅館設施', type: ActivityType.STAY, location: '由布院溫泉 古都之花心', travelInfo: '🚗 開車 10分鐘' }
+      { id: '4-10', time: '18:30', title: '飯店 Check-in', description: '享受溫泉旅館設施', type: ActivityType.STAY, location: '由布院溫泉 古都之花心', travelInfo: '🚗 開車 10分鐘' },
+      { id: '4-11', time: '20:00', title: '自助洗衣', description: 'コインランドリーグロリア湯布院店，24小時營業', type: ActivityType.OTHER, location: 'コインランドリーグロリア 湯布院店', travelInfo: '🚗 開車 5分鐘' }
     ]
   },
   {
@@ -105,8 +109,10 @@ export const ITINERARY_DATA: DayItinerary[] = [
       { id: '5-0', time: '06:30', title: '金鱗湖晨霧', description: '欣賞夢幻的晨霧美景（秋冬限定，建議早起）', type: ActivityType.SIGHTSEEING, location: '金鱗湖', travelInfo: '🚗 從飯店 10分鐘' },
       { id: '5-1', time: '07:30', title: '早餐', description: '金鱗湖附近或回飯店享用早餐', type: ActivityType.FOOD },
       { id: '5-2', time: '08:30', title: '九州自然野生動物園', description: '自駕遊覽 African Safari', type: ActivityType.SIGHTSEEING, location: '九州自然野生動物園 African Safari', travelInfo: '🚗 從由布院 50分鐘' },
-      { id: '5-3', time: '12:00', title: '午餐 (待定)', description: '別府地區特色料理（可參考推薦清單）', type: ActivityType.FOOD, travelInfo: '🚗 從動物園 40分鐘' },
-      { id: '5-4', time: '13:30', title: '別府地獄巡禮', description: '參觀著名的溫泉地獄', type: ActivityType.SIGHTSEEING, location: '海地獄', travelInfo: '🚗 開車 10分鐘' },
+      { id: '5-3', time: '12:00', title: '別府地獄巡禮', description: '海地獄 & 灶地獄，兩個地獄在同一區域', type: ActivityType.SIGHTSEEING, location: '海地獄', travelInfo: '🚗 從動物園 40分鐘到鐵輪' },
+      { id: '5-4', time: '13:45', title: '午餐：湖月煎餃', description: '別府名物煎餃專門店 (營業時間 11:00-20:00)', type: ActivityType.FOOD, location: '湖月', travelInfo: '🚗 從地獄溫泉到市區 15分鐘' },
+      { id: '5-4-1', time: '15:00', title: '竹瓦溫泉砂湯體驗', description: '別府名物砂浴體驗，被溫泉砂覆蓋全身 (營業時間 8:00-22:30)', type: ActivityType.SIGHTSEEING, location: '竹瓦温泉', travelInfo: '🚶 從湖月步行 5分鐘' },
+      { id: '5-4-2', time: '16:30', title: '別府世界之塔', description: '別府ラクテンチ遊樂園內的地標觀景塔，360度俯瞰別府灣 (營業時間 9:30-17:00)', type: ActivityType.SIGHTSEEING, location: '別府ラクテンチ', travelInfo: '🚗 從竹瓦溫泉開車 15分鐘' },
       { id: '5-5', time: '17:30', title: '由布院還車', description: 'JR駅レンタカー 由布院駅営業所', type: ActivityType.TRANSPORT, location: 'JR駅レンタカー 由布院駅営業所', travelInfo: '🚗 從別府 50分鐘' },
       { id: '5-5-1', time: '18:00', title: '晚餐 (待定)', description: '在由布院車站附近用餐', type: ActivityType.FOOD, location: '由布院站周邊' },
       { id: '5-6', time: '19:26', title: '由布6號', description: '由布院 19:26 -> 博多 21:33 抵達', type: ActivityType.TRANSPORT, location: '由布院站' },
