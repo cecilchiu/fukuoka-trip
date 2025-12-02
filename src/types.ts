@@ -14,6 +14,7 @@ export interface ItineraryItem {
   description?: string;
   type: ActivityType;
   location?: string;
+  travelInfo?: string;
 }
 
 export interface DayItinerary {
@@ -38,6 +39,12 @@ export interface DiningInfo {
   status: 'Booked' | 'Planned' | 'TBD';
   notes?: string;
   location?: string;
+}
+
+export interface DiningByDay {
+  day: string;
+  dayLabel: string;
+  restaurants: DiningInfo[];
 }
 
 export interface ChatMessage {

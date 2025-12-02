@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ITINERARY_DATA, TRIP_TITLE, TRIP_DATES, ACCOMMODATIONS, DINING_LIST, CHECKLIST_DATA, getActivityIcon } from './constants';
+import { ITINERARY_DATA, TRIP_TITLE, TRIP_DATES, ACCOMMODATIONS, DINING_BY_DAY, RECOMMENDED_RESTAURANTS, YUFUIN_DINNER_RECOMMENDATIONS, BEPPU_LUNCH_RECOMMENDATIONS, CHECKLIST_DATA, getActivityIcon } from './constants';
 import { ActivityType, ChatMessage } from './types';
 import { MapleLeaf } from './components/MapleLeaf';
 import { sendMessageToGemini, initializeAI } from './services/gemini';
-import { Calendar, Hotel, Coffee, Sparkles, Send, MapPin, Navigation, ClipboardCheck, CheckCircle2, Circle, KeyRound } from 'lucide-react';
+import { Calendar, Hotel, Coffee, Sparkles, Send, MapPin, Navigation, ClipboardCheck, CheckCircle2, Circle, KeyRound, ChevronDown, ChevronUp } from 'lucide-react';
 
 enum Tab {
   ITINERARY = 'ITINERARY',
@@ -29,6 +29,14 @@ export default function App() {
 
   // Checklist State
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
+
+  // Recommended Restaurants State
+  const [showRecommended, setShowRecommended] = useState(false);
+  const [showYufuinDinner, setShowYufuinDinner] = useState(false);
+  const [showBeppuLunch, setShowBeppuLunch] = useState(false);
+
+  // Dining by Day State (track which days are expanded)
+  const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const saved = localStorage.getItem('trip_checklist_v1');
@@ -133,9 +141,16 @@ export default function App() {
                 
                 <div className="bg-white p-4 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="inline-flex items-center gap-1 text-sm font-bold text-stone-400 bg-stone-50 px-2 py-1 rounded-md">
-                       {getActivityIcon(item.type)} {item.time}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className="inline-flex items-center gap-1 text-sm font-bold text-stone-400 bg-stone-50 px-2 py-1 rounded-md w-fit">
+                         {getActivityIcon(item.type)} {item.time}
+                      </span>
+                      {item.travelInfo && (
+                        <span className="text-[10px] text-orange-600 font-medium ml-1">
+                          {item.travelInfo}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <h3 className="text-lg font-bold text-stone-800 leading-tight mb-1">{item.title}</h3>
                   
@@ -201,46 +216,218 @@ export default function App() {
     </div>
   );
 
-  const renderDining = () => (
-    <div className="p-4 pb-24 max-w-lg mx-auto animate-fade-in">
-      <h2 className="text-2xl font-bold text-stone-800 mb-6 flex items-center gap-2">
-        <Coffee className="text-orange-700" /> 美食清單
-      </h2>
-      <div className="grid grid-cols-1 gap-4">
-        {DINING_LIST.map((food, idx) => (
-          <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-start">
-                 <h3 className="font-bold text-lg text-stone-800">{food.name}</h3>
-                 <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
-                   food.status === 'Booked' ? 'bg-emerald-100 text-emerald-700' :
-                   food.status === 'Planned' ? 'bg-blue-100 text-blue-700' :
-                   'bg-stone-200 text-stone-600'
-                 }`}>{
-                   food.status === 'Booked' ? '已預約' : 
-                   food.status === 'Planned' ? '計劃中' : '待定'
-                 }</span>
+  const renderDining = () => {
+    const toggleDay = (day: string) => {
+      setExpandedDays(prev => ({ ...prev, [day]: !prev[day] }));
+    };
+
+    return (
+      <div className="p-4 pb-24 max-w-lg mx-auto animate-fade-in">
+        <h2 className="text-2xl font-bold text-stone-800 mb-6 flex items-center gap-2">
+          <Coffee className="text-orange-700" /> 美食清單
+        </h2>
+
+        <div className="space-y-4">
+          {DINING_BY_DAY.map((dayData) => {
+            if (dayData.restaurants.length === 0) return null;
+            const isExpanded = expandedDays[dayData.day];
+
+            return (
+              <div key={dayData.day}>
+                <button
+                  onClick={() => toggleDay(dayData.day)}
+                  className="w-full bg-white border border-stone-200 rounded-2xl p-4 flex items-center justify-between hover:bg-stone-50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Coffee className="text-orange-600" size={18} />
+                    <div className="text-left">
+                      <h3 className="font-bold text-stone-800 text-sm">{dayData.dayLabel}</h3>
+                      <p className="text-xs text-stone-500">{dayData.restaurants.length} 家餐廳</p>
+                    </div>
+                  </div>
+                  {isExpanded ? <ChevronUp className="text-stone-600" size={20} /> : <ChevronDown className="text-stone-600" size={20} />}
+                </button>
+
+                {isExpanded && (
+                  <div className="mt-3 grid grid-cols-1 gap-3 animate-fade-in">
+                    {dayData.restaurants.map((food, idx) => (
+                      <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-between ml-4">
+                        <div>
+                          <div className="flex justify-between items-start">
+                             <h3 className="font-bold text-lg text-stone-800">{food.name}</h3>
+                             <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
+                               food.status === 'Booked' ? 'bg-emerald-100 text-emerald-700' :
+                               food.status === 'Planned' ? 'bg-blue-100 text-blue-700' :
+                               'bg-stone-200 text-stone-600'
+                             }`}>{
+                               food.status === 'Booked' ? '已預約' :
+                               food.status === 'Planned' ? '計劃中' : '待定'
+                             }</span>
+                          </div>
+                          <p className="text-stone-500 text-sm mt-1">{food.type}</p>
+                        </div>
+                        {food.notes && (
+                           <p className="text-xs text-stone-400 mt-4 border-t border-stone-100 pt-2">{food.notes}</p>
+                        )}
+                        {food.status !== 'TBD' && (
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(food.location || food.name)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-3 flex items-center justify-center gap-1 text-xs bg-stone-100 text-stone-600 py-2 rounded-lg hover:bg-stone-200 transition-colors"
+                          >
+                            <Navigation size={14} /> 搜尋位置
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <p className="text-stone-500 text-sm mt-1">{food.type}</p>
+            );
+          })}
+        </div>
+
+        {/* Recommended Restaurants Section - D2 晚餐 */}
+        <div className="mt-8">
+          <button
+            onClick={() => setShowRecommended(!showRecommended)}
+            className="w-full bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center justify-between hover:bg-orange-100 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Coffee className="text-orange-600" size={20} />
+              <div className="text-left">
+                <h3 className="font-bold text-stone-800">D2 太宰府返回博多路上推薦</h3>
+                <p className="text-xs text-stone-500">10 家餐廳推薦</p>
+              </div>
             </div>
-            {food.notes && (
-               <p className="text-xs text-stone-400 mt-4 border-t border-stone-100 pt-2">{food.notes}</p>
-            )}
-            {food.status !== 'TBD' && (
-              <a 
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(food.location || food.name)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 flex items-center justify-center gap-1 text-xs bg-stone-100 text-stone-600 py-2 rounded-lg hover:bg-stone-200 transition-colors"
-              >
-                <Navigation size={14} /> 搜尋位置
-              </a>
-            )}
-          </div>
-        ))}
+            {showRecommended ? <ChevronUp className="text-orange-600" /> : <ChevronDown className="text-orange-600" />}
+          </button>
+
+          {showRecommended && (
+            <div className="mt-4 grid grid-cols-1 gap-4 animate-fade-in">
+              {RECOMMENDED_RESTAURANTS.map((food, idx) => (
+                <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-between ml-4">
+                  <div>
+                    <div className="flex justify-between items-start">
+                       <h3 className="font-bold text-lg text-stone-800">{food.name}</h3>
+                       <span className="text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider bg-stone-200 text-stone-600">
+                         待定
+                       </span>
+                    </div>
+                    <p className="text-stone-500 text-sm mt-1">{food.type}</p>
+                  </div>
+                  {food.notes && (
+                     <p className="text-xs text-stone-400 mt-4 border-t border-stone-100 pt-2">{food.notes}</p>
+                  )}
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(food.location || food.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex items-center justify-center gap-1 text-xs bg-stone-100 text-stone-600 py-2 rounded-lg hover:bg-stone-200 transition-colors"
+                  >
+                    <Navigation size={14} /> 搜尋位置
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Yufuin Dinner Recommendations Section - D4 晚餐 */}
+        <div className="mt-4">
+          <button
+            onClick={() => setShowYufuinDinner(!showYufuinDinner)}
+            className="w-full bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center justify-between hover:bg-orange-100 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Coffee className="text-orange-600" size={20} />
+              <div className="text-left">
+                <h3 className="font-bold text-stone-800">D4 由布院晚餐推薦</h3>
+                <p className="text-xs text-stone-500">10 家餐廳推薦</p>
+              </div>
+            </div>
+            {showYufuinDinner ? <ChevronUp className="text-orange-600" /> : <ChevronDown className="text-orange-600" />}
+          </button>
+
+          {showYufuinDinner && (
+            <div className="mt-4 grid grid-cols-1 gap-4 animate-fade-in">
+              {YUFUIN_DINNER_RECOMMENDATIONS.map((food, idx) => (
+                <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-between ml-4">
+                  <div>
+                    <div className="flex justify-between items-start">
+                       <h3 className="font-bold text-lg text-stone-800">{food.name}</h3>
+                       <span className="text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider bg-stone-200 text-stone-600">
+                         待定
+                       </span>
+                    </div>
+                    <p className="text-stone-500 text-sm mt-1">{food.type}</p>
+                  </div>
+                  {food.notes && (
+                     <p className="text-xs text-stone-400 mt-4 border-t border-stone-100 pt-2">{food.notes}</p>
+                  )}
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(food.location || food.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex items-center justify-center gap-1 text-xs bg-stone-100 text-stone-600 py-2 rounded-lg hover:bg-stone-200 transition-colors"
+                  >
+                    <Navigation size={14} /> 搜尋位置
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Beppu Lunch Recommendations Section - D5 午餐 */}
+        <div className="mt-4">
+          <button
+            onClick={() => setShowBeppuLunch(!showBeppuLunch)}
+            className="w-full bg-orange-50 border border-orange-200 rounded-2xl p-4 flex items-center justify-between hover:bg-orange-100 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Coffee className="text-orange-600" size={20} />
+              <div className="text-left">
+                <h3 className="font-bold text-stone-800">D5 別府午餐推薦</h3>
+                <p className="text-xs text-stone-500">10 家餐廳推薦</p>
+              </div>
+            </div>
+            {showBeppuLunch ? <ChevronUp className="text-orange-600" /> : <ChevronDown className="text-orange-600" />}
+          </button>
+
+          {showBeppuLunch && (
+            <div className="mt-4 grid grid-cols-1 gap-4 animate-fade-in">
+              {BEPPU_LUNCH_RECOMMENDATIONS.map((food, idx) => (
+                <div key={idx} className="bg-white p-5 rounded-2xl shadow-sm border border-stone-100 flex flex-col justify-between ml-4">
+                  <div>
+                    <div className="flex justify-between items-start">
+                       <h3 className="font-bold text-lg text-stone-800">{food.name}</h3>
+                       <span className="text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider bg-stone-200 text-stone-600">
+                         待定
+                       </span>
+                    </div>
+                    <p className="text-stone-500 text-sm mt-1">{food.type}</p>
+                  </div>
+                  {food.notes && (
+                     <p className="text-xs text-stone-400 mt-4 border-t border-stone-100 pt-2">{food.notes}</p>
+                  )}
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(food.location || food.name)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex items-center justify-center gap-1 text-xs bg-stone-100 text-stone-600 py-2 rounded-lg hover:bg-stone-200 transition-colors"
+                  >
+                    <Navigation size={14} /> 搜尋位置
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderChecklist = () => {
     const totalItems = CHECKLIST_DATA.reduce((acc, cat) => acc + cat.items.length, 0);
