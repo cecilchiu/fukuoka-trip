@@ -14,7 +14,7 @@ export const getActivityIcon = (type: ActivityType) => {
 };
 
 export const TRIP_TITLE = "福岡賞楓之旅";
-export const TRIP_DATES = "2024年 12月3日 - 12月9日";
+export const TRIP_DATES = "2025年 12月3日 - 12月9日";
 
 export const ITINERARY_DATA: DayItinerary[] = [
   {
@@ -47,9 +47,12 @@ export const ITINERARY_DATA: DayItinerary[] = [
       { id: '2-2', time: '10:30', title: '秋月城跡', description: '賞楓勝地 (黑門、垂裕神社)', type: ActivityType.SIGHTSEEING, location: '日本〒838-0011 Fukuoka, Asakura, Akizukinotori, ６６３', travelInfo: '🚗 從中洲 60分鐘' },
       { id: '2-3', time: '12:30', title: '午餐：だんごあん', description: '秋月山林間的涼台料理', type: ActivityType.FOOD, location: 'だんごあん', travelInfo: '🚗 開車 5分鐘' },
       { id: '2-4', time: '14:30', title: '太宰府天滿宮', description: '參拜學問之神與表參道散步', type: ActivityType.SIGHTSEEING, location: '太宰府天滿宮', travelInfo: '🚗 從秋月 40分鐘' },
-      { id: '2-5', time: '17:30', title: '竈門神社', description: '知名的結緣與賞楓勝地 (夜楓)', type: ActivityType.SIGHTSEEING, location: '竈門神社', travelInfo: '🚗 開車 10分鐘' },
-      { id: '2-6', time: '20:00', title: '晚餐 (待定)', description: '從太宰府返回博多路上用餐', type: ActivityType.FOOD, travelInfo: '🚗 從竈門神社 30分鐘' },
-      { id: '2-7', time: '21:30', title: '返回飯店', description: '開車返回福岡中洲休息', type: ActivityType.STAY, location: 'S-PERIA飯店 福岡中洲' }
+      { id: '2-4-1', time: '16:00', title: '點心：梅枝餅', description: '太宰府名物，在表參道上任選一家品嚐', type: ActivityType.FOOD, location: '太宰府天滿宮表參道' },
+      { id: '2-4-2', time: '16:30', title: '點心：天山 草莓最中·大福', description: 'IG打卡熱點的草莓甜點', type: ActivityType.FOOD, location: '天山 本店', travelInfo: '🚶 步行 1分鐘' },
+      { id: '2-5', time: '17:30', title: '竈門神社', description: '知名的結緣與賞楓勝地 (夜楓至19:00)', type: ActivityType.SIGHTSEEING, location: '竈門神社', travelInfo: '🚗 開車 10分鐘' },
+      { id: '2-5-1', time: '19:00', title: '開車返回中洲 & 停車', description: '從神社開車返回飯店附近停車場', type: ActivityType.TRANSPORT, location: '福岡中洲', travelInfo: '🚗 開車約 45分鐘' },
+      { id: '2-6', time: '20:00', title: '晚餐：博多もつ鍋前田屋 リバーサイド中洲店', description: '博多特色牛腸鍋，從停車場步行前往', type: ActivityType.FOOD, location: '博多もつ鍋前田屋 リバーサイド中洲店', travelInfo: '🚶 步行約 10分鐘' },
+      { id: '2-7', time: '21:45', title: '返回飯店', description: '晚餐後散步回飯店休息', type: ActivityType.STAY, location: 'S-PERIA飯店 福岡中洲' }
     ]
   },
   {
